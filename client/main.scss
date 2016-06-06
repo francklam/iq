@@ -1,0 +1,32 @@
+$color-header: #972715;
+$color-text: #FFF;
+$color-button: #1E1E20;
+$color-separator:#BBC3C6;
+
+body{
+	color: $color-button;
+}
+
+header{
+	background-color: $color-header;
+	padding: 5px;
+	text-align: center;
+	color: $color-text;
+	font-size: 1em;
+}
+
+main{
+	padding-bottom: 80px;
+}
+
+.navigation{
+	position: fixed;
+	bottom: 0;
+	border-left: 0;
+	border-right: 0;
+}
+
+.index{
+	margin-top: 30px !important;
+	margin-left: 30px !important;
+}

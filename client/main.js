@@ -1,22 +1,33 @@
-import { Template } from 'meteor/templating';
-import { ReactiveVar } from 'meteor/reactive-var';
+import { Meteor } from 'meteor/meteor';
+import { Push } from 'meteor/raix:push';
 
-import './main.html';
+Meteor.startup(() => {
 
-Template.hello.onCreated(function helloOnCreated() {
-  // counter starts at 0
-  this.counter = new ReactiveVar(0);
-});
+  if (Meteor.isCordova) {
 
-Template.hello.helpers({
-  counter() {
-    return Template.instance().counter.get();
-  },
-});
+    Push.debug = true;
 
-Template.hello.events({
-  'click button'(event, instance) {
-    // increment the counter when button is clicked
-    instance.counter.set(instance.counter.get() + 1);
-  },
-});
+    Push.addListener('token', (token) => {
+      alert('Token: ' + JSON.stringify(token));
+      console.log(device.platform);
+      if (device.platform =='Android') {
+        Session.set('token',token)
+      }
+      else if (device.platform =='iOS') {
+        Session.set('token',token)
+      }
+    });
+
+    Push.addListener('alert', (notification) => {
+      // Called on every message
+      alert(notification.message);
+    });
+
+    Push.addListener('error', (err) => {
+      alert(err);
+    });
+
+    // window.open = cordova.InAppBrowser.open;
+  }
+
+})
