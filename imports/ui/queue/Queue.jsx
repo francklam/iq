@@ -6,7 +6,7 @@ import { Meteor } from 'meteor/meteor';
 import QRCode from 'qrcode.react';
 import QueueOption from './QueueOption.jsx';
 import Queueing from './Queueing.jsx';
-import { Queues, QueueOptions } from '../../api/queues.js';
+import { Queues } from '../../api/queues.js';
 
 class Queue extends Component {
 
@@ -37,7 +37,7 @@ class Queue extends Component {
     let description = ReactDOM.findDOMNode(this.refs.description).value.trim();
 
     if (letter != "" && description != "") {
-      Meteor.call('queues.add','Toto',letter,description);
+      Meteor.call('queues.add',this.props.store,letter,description);
     }
   }
 
@@ -67,7 +67,7 @@ class Queue extends Component {
     let randomKey = Math.floor(Math.random() * 1000000);
 
     this.setState({
-      scanCode: this.props.queues[0].queue + '|' + letter + '|' + number + '|' + randomKey
+      scanCode: this.props.queues[0].store + '|' + letter + '|' + number + '|' + randomKey
     })
   }
 
@@ -105,6 +105,7 @@ class Queue extends Component {
   render() {
     return (
       <div>
+        {this.props.store?this.props.store:''}
         {this.renderInputQueue()}
         {this.renderQueues()}
         <div className="ui center aligned basic segment" id="context">
@@ -122,15 +123,15 @@ class Queue extends Component {
 
 Queue.propTypes = {
   queues: PropTypes.array.isRequired,
-  scannedCode: PropTypes.string.isRequired
+  store: PropTypes.string,
 };
 
-export default createContainer(() => {
+export default createContainer((props) => {
 
-  Meteor.subscribe('queueOptions');
+  Meteor.subscribe('queueList');
 
   return {
-   queues: QueueOptions.find().fetch(),
-   scannedCode: Session.get("scannedCode"),
+   queues: Queues.find({storeName:props.store}).fetch(),
+   store: props.store,
   };
 }, Queue);

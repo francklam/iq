@@ -5,7 +5,7 @@ import { Meteor } from 'meteor/meteor';
 
 import QRCode from 'qrcode.react';
 import QueueingItem from './QueueingItem.jsx';
-import { Queues, QueueOptions } from '../../api/queues.js';
+import { Queues } from '../../api/queues.js';
 
 
 class Queueing extends Component {
@@ -41,7 +41,7 @@ class Queueing extends Component {
   }
 
   getCode() {
-    if (this.props.currentCode != "") {
+    if (this.props.currentCode != "" && typeof this.props.currentCode != 'undefined') {
       let array = this.props.currentCode.split('|');
       if (!this.codeAlreadyAdded(array[0], array[1])) {
         Meteor.call('queues.setScannedcode', this.props.currentCode);
@@ -74,7 +74,7 @@ class Queueing extends Component {
         <tbody>
           { this.props.myCodes.map((oneCode,i) => {
             let currentQueue = this.props.queues.find((oneQueue) => {
-              return oneCode.queue == oneQueue.queue && oneCode.letter == oneQueue.letter;
+              return oneCode.queue == oneQueue.store && oneCode.letter == oneQueue.letter;
             });
             return (
               <QueueingItem key={i} code={oneCode} queue={currentQueue}/>
@@ -102,18 +102,18 @@ class Queueing extends Component {
 }
 
 Queueing.propTypes = {
-  currentCode: PropTypes.string.isRequired,
+  currentCode: PropTypes.string,
   queues: PropTypes.array.isRequired,
   myCodes: PropTypes.array.isRequired,
 };
 
 export default createContainer((props) => {
 
-  Meteor.subscribe('queueOptionList');
+  Meteor.subscribe('queueList');
 
   return {
     currentCode: props.currentCode,
-    queues: QueueOptions.find().fetch(),
+    queues: Queues.find().fetch(),
     myCodes: Session.get("myCodes"),
   };
 }, Queueing);

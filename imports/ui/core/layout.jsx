@@ -10,17 +10,17 @@ MainLayout = ({content}) => (
       </main>
       <nav className="navigation ui fluid three item menu labeled icon">
 
-		  <a className="item" href="/newEvent">
+		  <a className="item" href="/store">
 		    <i className="calendar icon"></i>
-		    Events
+		    Store
 		  </a>
-		  <a className="item" href="/balance">
+		  <a className="item" href="/queueing">
 		    <i className="dollar icon"></i>
-		    Balance
+		    Queue
 		  </a>
-		  <a className="item" href="/setting">
+		  <a className="item" href="/map">
 		    <i className="setting icon"></i>
-		    Settings
+		    Map
 		  </a>
 
       </nav>

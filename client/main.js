@@ -3,7 +3,12 @@ import { Push } from 'meteor/raix:push';
 
 Meteor.startup(() => {
 
+  if (Meteor.isClient) {
+    FlowRouter.go('Default');
+  }
+
   if (Meteor.isCordova) {
+    FlowRouter.go('Queue');
 
     Push.debug = true;
 

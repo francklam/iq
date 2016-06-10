@@ -5,11 +5,15 @@
     "start": "meteor run"
   },
   "dependencies": {
+    "google-map-react": "^0.13.0",
     "meteor-node-stubs": "~0.2.0",
     "qrcode.react": "^0.6.1",
     "react": "^15.1.0",
     "react-addons-pure-render-mixin": "^15.1.0",
+    "react-addons-shallow-compare": "^15.1.0",
+    "react-addons-update": "^15.1.0",
     "react-dom": "^15.1.0",
-    "react-mounter": "^1.2.0"
+    "react-mounter": "^1.2.0",
+    "react-pure-render": "^1.0.2"
   }
 }

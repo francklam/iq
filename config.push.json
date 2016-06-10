@@ -1,0 +1,16 @@
+{
+  "apn": {
+    "passphrase": "ksapp@1234",
+    "key": "KSPushKey.pem",
+    "cert": "KSPushCert.pem"
+  },
+  "gcm": {
+    "apiKey": "AIzaSyDkMw1Y-X5qa8AGhh9jtrjcDpqNF_KVSWE",
+    "projectNumber": 604931370488
+  },
+  "badge": true,
+  "sound": true,
+  "alert": true,
+  "production": false
+
+}
