@@ -24,7 +24,12 @@ export default class SearchBox extends Component {
   }
 
   render() {
-    return <input id="pac-input" ref="input" {...this.props} type="text"/>;
+    return (
+      <div className="ui icon input">
+        <input id="pac-input" ref="input" {...this.props} type="text" placeholder="Input your address"/>
+        <i className="search icon"></i>
+      </div>
+    )
   }
 }
 

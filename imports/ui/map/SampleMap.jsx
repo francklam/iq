@@ -5,6 +5,8 @@ import shallowCompare from 'react-addons-shallow-compare';
 import GoogleMap from 'google-map-react';
 
 import SearchBox from './SearchBox.jsx';
+import Marker from './Marker.jsx';
+import Places from './Places.jsx';
 
 function createMapOptions(maps) {
   // next props are exposed at maps
@@ -35,11 +37,14 @@ export default class SampleMap extends Component {
     super(props);
 
     this.state = {
-      myLocation : this.props.center
+      myLocation : this.props.center,
+      mapObject: null,
+      mapLoaded : false
     };
+
   }
 
-  onPlacesChanged(places) {
+  onPlacesSelected(places) {
     let onePlace = places[0]; //First place returned
     newLat = onePlace.geometry.location.lat();
     newLng = onePlace.geometry.location.lng();
@@ -49,16 +54,38 @@ export default class SampleMap extends Component {
     });
   }
 
+  onClick({x, y, lat, lng, event}) {
+    // this.setState({
+    //   myLocation: {lat: lat, lng: lng},
+    // });
+  }
+
+  handleSaveLocation(event) {
+    event.preventDefault();
+
+    console.log(this.state.myLocation);
+  }
+
   render() {
     return (
       <div className="map">
-        <SearchBox onPlacesChanged={this.onPlacesChanged.bind(this)}/>
+        <SearchBox onPlacesChanged={this.onPlacesSelected.bind(this)}/>
+        <button className="ui button" onClick={this.handleSaveLocation.bind(this)}>Save location</button>
         <GoogleMap
-         defaultCenter={this.props.center}
-         defaultZoom={this.props.zoom}
-         options={createMapOptions}>
-         <div {...this.state.myLocation}><i className="setting big icon"></i></div>
+           onGoogleApiLoaded={
+             ({map, maps}) => this.setState({
+               mapObject: map,
+               mapLoaded: true
+             })}
+           center={this.state.myLocation}
+           zoom={this.props.zoom}
+           options={createMapOptions}
+           onClick={this.onClick.bind(this)}
+           yesIWantToUseGoogleMapApiInternals={true}
+         >
+         <Marker {...this.state.myLocation} />
         </GoogleMap>
+        <Places location={this.state.myLocation} map={this.state.mapObject} mapLoaded={this.state.mapLoaded} />
       </div>
     );
   }

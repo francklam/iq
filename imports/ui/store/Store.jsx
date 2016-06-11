@@ -25,6 +25,11 @@ class Store extends Component {
     }
   }
 
+  handleAddMap(event) {
+    event.preventDefault();
+
+  }
+
   renderInputStoreInfo() {
     return (
       <form className="ui form">
@@ -38,6 +43,10 @@ class Store extends Component {
             <tr>
               <td><label>Address</label></td>
               <td><input type="text" ref="address" placeholder="Input an address"/></td>
+            </tr>
+            <tr>
+              <td><label>Add a map</label></td>
+              <td><button className="ui button" onClick={this.handleAddMap.bind(this)}>Add map</button></td>
             </tr>
             <tr>
               <td><label>Type</label></td>
