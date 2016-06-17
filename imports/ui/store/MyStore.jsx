@@ -7,7 +7,7 @@ import { Stores } from '../../api/stores.js';
 import AccountsUIWrapper from '../login/AccountsUIWrapper.jsx';
 import SampleMap from '../map/SampleMap.jsx';
 
-class Store extends Component {
+class MyStore extends Component {
 
   handleAddStore(event) {
     event.preventDefault();
@@ -17,7 +17,7 @@ class Store extends Component {
     let type = ReactDOM.findDOMNode(this.refs.type).value.trim();
 
     if (name != "" && address != "" && type !="") {
-      Meteor.call('stores.add',this.props.currentUser._id, name,address,type);
+      Meteor.call('stores.add', name, address, type);
 
       ReactDOM.findDOMNode(this.refs.name).value = "";
       ReactDOM.findDOMNode(this.refs.address).value = "";
@@ -58,10 +58,6 @@ class Store extends Component {
     )
   }
 
-  handleSelectStore(event) {
-      event.preventDefault();
-  }
-
   renderStores() {
     return (
       <div>
@@ -75,7 +71,7 @@ class Store extends Component {
           </thead>
           <tbody>
             { this.props.stores.map((store) => {
-                let link = "/store/" + store.name;
+                let link = "/store/" + store._id;
                 return (
                   <tr key={store._id}>
                     <td><a href={link}>{store.name}</a></td>
@@ -101,24 +97,24 @@ class Store extends Component {
             {this.renderInputStoreInfo()}
             {this.renderStores()}
           </div>
-          : <h3>Please log in</h3>
+          : <h3>You are not logged in</h3>
         }
       </div>
     )
   }
 }
 
-Store.propTypes = {
+MyStore.propTypes = {
   currentUser: PropTypes.object,
   stores: PropTypes.array.isRequired,
 };
 
 export default createContainer(() => {
 
-  Meteor.subscribe("storeList");
+  Meteor.subscribe("storeList", true);
 
   return {
-   currentUser: Meteor.user(),
-   stores: Stores.find().fetch(),
+    currentUser: Meteor.user(),
+    stores: Stores.find().fetch(),
   };
-}, Store);
+}, MyStore);

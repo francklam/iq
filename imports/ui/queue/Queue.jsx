@@ -7,6 +7,7 @@ import QRCode from 'qrcode.react';
 import QueueOption from './QueueOption.jsx';
 import Queueing from './Queueing.jsx';
 import { Queues } from '../../api/queues.js';
+import { Stores } from '../../api/stores.js';
 
 class Queue extends Component {
 
@@ -38,6 +39,9 @@ class Queue extends Component {
 
     if (letter != "" && description != "") {
       Meteor.call('queues.add',this.props.store,letter,description);
+
+      ReactDOM.findDOMNode(this.refs.letter).value = 0;
+      ReactDOM.findDOMNode(this.refs.description).value = 0;
     }
   }
 
@@ -61,14 +65,37 @@ class Queue extends Component {
     )
   }
 
-  handleNextCode(letter, number) {
+  codeAlreadyAdded(queue) {
+    let array = Session.get("myCodes");
+    for (let i=0; i < array.length; i++) {
+      if (array[i].queue == queue._id && array[i].letter == queue.letter ) return true;
+    }
+    return false;
+  }
+
+  handleNextCode(queue) {
     event.preventDefault();
 
-    let randomKey = Math.floor(Math.random() * 1000000);
+    if (!this.codeAlreadyAdded(queue)) {
+      Meteor.call('queues.getTicket',queue._id, (err, res) => {
+        if (err) {
+          alert("Could not get ticket");
+        }
+        else {
+          let array = res.split('|');
+          let currentCodes = this.props.myCodes;
+          currentCodes.push({queue:array[0],letter:array[1],number:array[2]});
+          Session.setPersistent("myCodes", currentCodes);
+        }
+      });
+    }
 
-    this.setState({
-      scanCode: this.props.queues[0].store + '|' + letter + '|' + number + '|' + randomKey
-    })
+
+    // let randomKey = Math.floor(Math.random() * 1000000);
+    //
+    // this.setState({
+    //   scanCode: this.props.queues[0].store + '|' + letter + '|' + number + '|' + randomKey
+    // })
   }
 
   handleReset(event) {
@@ -80,7 +107,7 @@ class Queue extends Component {
   renderQueues() {
     return (
       <div>
-        <button className="ui button" type="text" onClick={this.handleReset.bind(this)}>Reset numbers</button>
+        {this.props.isOwner ? <button className="ui button" type="text" onClick={this.handleReset.bind(this)}>Reset numbers</button> : ''}
         <table className="ui compact unstackable table">
           <thead>
             <tr>
@@ -93,7 +120,7 @@ class Queue extends Component {
           <tbody>
             { this.props.queues.map((queue) => {
                 return (
-                  <QueueOption key={queue._id} queue={queue} onSelected={this.handleNextCode.bind(this)}/>
+                  <QueueOption key={queue._id} queue={queue} isOwner={this.props.isOwner} onSelected={this.handleNextCode.bind(this)}/>
                 )}
             )}
           </tbody>
@@ -105,8 +132,14 @@ class Queue extends Component {
   render() {
     return (
       <div>
-        {this.props.store?this.props.store:''}
-        {this.renderInputQueue()}
+        <h3>{this.props.store}</h3>
+        { this.props.isOwner ?
+          <div>
+            <h4>You are the owner of the store</h4>
+            {this.renderInputQueue()}
+          </div>
+          :''
+        }
         {this.renderQueues()}
         <div className="ui center aligned basic segment" id="context">
           <div>
@@ -122,16 +155,23 @@ class Queue extends Component {
 }
 
 Queue.propTypes = {
+  currentUser: PropTypes.object,
   queues: PropTypes.array.isRequired,
-  store: PropTypes.string,
+  isOwner: PropTypes.bool,
+  store: PropTypes.string.isRequired,
+  myCodes: PropTypes.array.isRequired,
 };
 
 export default createContainer((props) => {
 
   Meteor.subscribe('queueList');
+  Meteor.subscribe('storeList', true)
 
   return {
-   queues: Queues.find({storeName:props.store}).fetch(),
-   store: props.store,
+    currentUser: Meteor.user(),
+    queues: Queues.find({store:props.store}).fetch(),
+    isOwner: Stores.find({_id:props.store}).fetch().length > 0,
+    store: props.store,
+    myCodes: Session.get("myCodes"),
   };
 }, Queue);

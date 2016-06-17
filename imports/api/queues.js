@@ -15,26 +15,38 @@ if (Meteor.isServer) {
 }
 
 Meteor.methods({
-  'queues.add'(name, letter, description) {
-    let store = Stores.findOne({name:name});
+  'queues.add'(storeId, letter, description) {
+    const store = Stores.findOne(storeId);
+
+    if (!Meteor.userId() || store.owner != Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+
     if (typeof store != "undefined") {
       let existingQueue = Queues.findOne({store:store._id,letter:letter});
       if (typeof existingQueue == "undefined") {
         Queues.insert({
+          owner: store.owner,
           store: store._id,
-          storeName: name,
+          storeName: store.name,
           letter: letter,
           description: description,
           current: 0,
-          next: 1
+          next: 1,
+          tickets: []
         })
       }
     }
   },
   'queues.currentMinus'(queueId) {
-    const oneCode = Queues.findOne(queueId);
-    if (oneCode.current > 0) {
-      let newCode = oneCode.current - 1;
+    const oneQueue = Queues.findOne(queueId);
+
+    if (!Meteor.userId() && oneQueue.owner != Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+
+    if (oneQueue.current > 0) {
+      let newCode = oneQueue.current - 1;
       Queues.update(queueId, {
         $set: {
           current: newCode
@@ -43,9 +55,14 @@ Meteor.methods({
     }
   },
   'queues.currentPlus'(queueId) {
-    const oneCode = Queues.findOne(queueId);
-    if (oneCode.current < oneCode.next - 1) {
-      let newCode = oneCode.current + 1;
+    const oneQueue = Queues.findOne(queueId);
+
+    if (!Meteor.userId() && oneQueue.owner != Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+
+    if (oneQueue.current < oneQueue.next - 1) {
+      let newCode = oneQueue.current + 1;
       Queues.update(queueId, {
         $set: {
           current: newCode
@@ -54,10 +71,11 @@ Meteor.methods({
     }
   },
   'queues.nextCode'(queueId) {
+    const oneQueue = Queues.findOne(queueId);
+
     let newCode = 1;
-    const oneCode = Queues.findOne(queueId);
-    if (typeof oneCode != "undefined") {
-      newCode = parseInt(oneCode.next) + 1;
+    if (typeof oneQueue != "undefined") {
+      newCode = parseInt(oneQueue.next) + 1;
       Queues.update(queueId, {
         $set: {
           next: newCode
@@ -66,7 +84,33 @@ Meteor.methods({
     }
     return newCode;
   },
+  'queues.getTicket'(queueId) {
+    const oneQueue = Queues.findOne(queueId);
+
+    let ticket = "";
+    if (typeof oneQueue != "undefined") {
+      let randomKey = Math.floor(Math.random() * 1000000);
+      ticket = oneQueue._id + '|' + oneQueue.letter + '|' + oneQueue.next + '|' + randomKey
+      newCode = parseInt(oneQueue.next) + 1;
+      let newTickets = oneQueue.tickets;
+      newTickets.push(ticket);
+
+      Queues.update(queueId, {
+        $set: {
+          next: newCode,
+          tickets: newTickets
+        }
+      });
+    }
+    return ticket;
+  },
   'queues.reset'(queueId) {
+    const oneQueue = Queues.findOne(queueId);
+
+    if (!Meteor.userId() && oneQueue.owner != Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+
     Queues.update({queue:queueId}, {
       $set: {
         current: 0,
@@ -75,7 +119,4 @@ Meteor.methods({
       {multi: true}
     );
   },
-  'queues.setScannedcode'(code) {
-
-  }
 });

@@ -10,10 +10,10 @@ export default class QueueOption extends Component {
   handleNextCode(event) {
     event.preventDefault();
 
-    let next = ReactDOM.findDOMNode(this.refs.next).value.trim();
-    this.props.onSelected(this.props.queue.letter, next);
+    // let next = ReactDOM.findDOMNode(this.refs.next).value.trim();
+    this.props.onSelected(this.props.queue);
 
-    Meteor.call('queues.nextCode',this.props.queue._id);
+    // Meteor.call('queues.nextCode',this.props.queue._id);
 
   }
 
@@ -36,9 +36,9 @@ export default class QueueOption extends Component {
         <td>{queue.description}</td>
         <td>{queue.letter}</td>
         <td>
-          <button className="ui small basic red button" type="text" onClick={this.handleMinusCurrent.bind(this)}>-</button>
+          {this.props.isOwner ? <button className="ui small basic red button" type="text" onClick={this.handleMinusCurrent.bind(this)}>-</button>:''}
           {queue.current}
-          <button className="ui small basic green button" type="text" onClick={this.handlePlusCurrent.bind(this)}>+</button>
+          {this.props.isOwner ? <button className="ui small basic green button" type="text" onClick={this.handlePlusCurrent.bind(this)}>+</button>:''}
         </td>
         <td><input className="ui small button" type="button" ref="next" value={queue.next} onClick={this.handleNextCode.bind(this)}/></td>
       </tr>

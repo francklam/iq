@@ -40,7 +40,7 @@ export default class Places extends Component {
     let request = {
       location: whereSearch,
       radius: '500',
-      type: 'store'
+      type: 'restaurant'
     };
 
     this.service = new google.maps.places.PlacesService(this.props.map);

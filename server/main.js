@@ -3,6 +3,7 @@ import { Push } from 'meteor/raix:push';
 
 import '../imports/api/notifications.js';
 import '../imports/api/queues.js';
+import '../imports/api/stores.js';
 
 Meteor.startup(() => {
   // code to run on server at startup

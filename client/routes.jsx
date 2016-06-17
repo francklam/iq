@@ -4,7 +4,8 @@ import React from 'react';
 
 import Queue from '../imports/ui/queue/Queue.jsx';
 import Queueing from '../imports/ui/queue/Queueing.jsx';
-import Store from '../imports/ui/store/Store.jsx';
+import MyStore from '../imports/ui/store/MyStore.jsx';
+import FindStore from '../imports/ui/store/FindStore.jsx';
 import SampleMap from '../imports/ui/map/SampleMap.jsx';
 
 import '../imports/ui/core/layout.jsx';
@@ -15,7 +16,7 @@ import '../imports/api/queues.js';
 FlowRouter.route('/', {
   name: 'Default',
   triggersEnter: [(context, redirect) => {
-    redirect('Queueing');
+    redirect('FindStore');
   }]
 });
 FlowRouter.route('/queueing', {
@@ -34,11 +35,19 @@ FlowRouter.route('/map', {
     });
   },
 });
-FlowRouter.route('/store', {
-  name: 'Store',
+FlowRouter.route('/mystore', {
+  name: 'MyStore',
   action() {
     mount(MainLayout,{
-       content: <Store />
+       content: <MyStore />
+    });
+  },
+});
+FlowRouter.route('/findstore', {
+  name: 'FindStore',
+  action() {
+    mount(MainLayout,{
+       content: <FindStore />
     });
   },
 });

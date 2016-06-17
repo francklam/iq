@@ -68,7 +68,7 @@ class Queueing extends Component {
             <th>Queue</th>
             <th>Letter</th>
             <th>Number</th>
-            <th>Current</th>
+            <th>Remaining</th>
           </tr>
         </thead>
         <tbody>
